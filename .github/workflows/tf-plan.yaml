@@ -1,0 +1,55 @@
+# This is a basic workflow to help you get started with Actions
+
+name: TF-Plan
+env:
+  TFSTATE_ID: 50694
+  AWSENV: dev
+  AWS_REGION: 'ap-southeast-1'
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches:
+    - '!master'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+
+  tf-plan:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # runs within your Docker container
+    container:
+      image: docker://cg5labs/my-alpine:latest    # checkout your code from your repository
+    
+    steps:
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+ 
+    - name: check
+      run: |
+          /bin/ls -l "${GITHUB_WORKSPACE}/"
+      
+    - name: Terraform init
+      run: |
+          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" init \
+            -backend=true \
+            -backend-config="dynamodb_table=tf-remote-state-lock" \
+            -backend-config="bucket=tc-remotestate-${TFSTATE_ID}"
+
+          #uses: actions/checkout@v2
+
+    - name: Terraform plan
+      run: |
+          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" \
+            plan -var-file="../${AWSENV}/terraform.tfvars"
+      

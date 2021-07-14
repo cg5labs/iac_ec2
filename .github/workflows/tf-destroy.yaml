@@ -1,0 +1,51 @@
+
+name: TF-Destroy
+env:
+  TFSTATE_ID: 50694
+  AWSENV: 'dev'
+  AWS_REGION: 'ap-southeast-1'
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+# Controls when the workflow will run
+on:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+
+  tf-destroy:
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # runs within your Docker container
+    container:
+      image: docker://cg5labs/my-alpine:latest    # checkout your code from your repository
+    
+    steps:
+
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Terraform init
+      run: |
+          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" init \
+            -backend=true \
+            -backend-config="dynamodb_table=tf-remote-state-lock" \
+            -backend-config="bucket=tc-remotestate-${TFSTATE_ID}"
+
+    - name: Terraform refresh
+      run: |
+          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" \
+            refresh \
+            -var-file="../${AWSENV}/terraform.tfvars"
+
+    - name: Terraform destroy
+      run: |
+          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" \
+            destroy -auto-approve \
+            -var-file="../${AWSENV}/terraform.tfvars"
+
