@@ -14,46 +14,19 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_security_group" "allow_ssh-sg" {
-  name        = "allow_ssh"
-  description = "Allow ssh inbound traffic"
-  vpc_id      = aws_vpc.ec2-vpc.id
+provider "random" {}
 
-  ingress {
-    description      = "SSH from VPC"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = [aws_vpc.ec2-vpc.cidr_block]
-  }
+resource "random_pet" "name" {}
 
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
+resource "aws_instance" "web" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t2.micro"
+  user_data     = file("../lib/init-script.sh")
 
-  tags = {
-    Name = "allow_ssh"
-  }
-}
-
-module "ec2_test_cluster" {
-  source                 = "terraform-aws-modules/ec2-instance/aws"
-  version                = "~> 2.0"
-
-  name                   = "ubuntu-cluster"
-  instance_count         = 2
-
-  ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t2.micro"
   key_name               = "debian-test"
   monitoring             = true
-  vpc_security_group_ids = [aws_security_group.allow_ssh-sg.id]
 
   tags = {
-    Terraform   = "true"
-    Environment = "dev"
+    Name = random_pet.name.id
   }
 }
