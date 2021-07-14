@@ -58,6 +58,12 @@ jobs:
           /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" \
             output -json instance_public_ip > ${GITHUB_WORKSPACE}/tf_value.txt
 
+    - name: Upload tf_value.txt
+      uses: actions/upload-artifact@v2
+      with:
+        name: tf_value.txt
+        path: tf_value.txt
+
     - uses: gliech/create-github-secret-action@v1
       with:
         name: FRONT_DOOR_PASSWORD
