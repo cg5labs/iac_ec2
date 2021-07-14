@@ -68,7 +68,7 @@ resource "aws_instance" "web" {
   }
 
   network_interface {
-    network_interface_id = aws_network_interface.foo.id
+    network_interface_id = aws_network_interface.web.id
     device_index         = 0
   }
 
