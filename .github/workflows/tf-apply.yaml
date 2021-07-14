@@ -50,11 +50,13 @@ jobs:
 
     - name: Terraform output
       run: |
-          /usr/bin/terraform output -json instance_public_ip 
+          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" \
+            output -json instance_public_ip
 
     - name: Terraform output to file
       run: |
-          /usr/bin/terraform output -json instance_public_ip > ${GITHUB_WORKSPACE}/tf_value.txt
+          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" \
+            output -json instance_public_ip > ${GITHUB_WORKSPACE}/tf_value.txt
 
     - uses: gliech/create-github-secret-action@v1
       with:
