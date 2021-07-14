@@ -49,6 +49,8 @@ resource "aws_instance" "web" {
   key_name      = "debian-test"
   instance_type = "t2.micro"
   monitoring    = true
+  vpc_security_group_ids = [aws_security_group.web-sg.id]
+
 
   tags = {
     Name = random_pet.name.id
