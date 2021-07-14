@@ -56,10 +56,10 @@ resource "aws_instance" "web" {
     Name = random_pet.name.id
   }
 
-  network_interface {
-    network_interface_id = aws_network_interface.web.id
-    device_index         = 0
-  }
+  #network_interface {
+  #  network_interface_id = aws_network_interface.web.id
+  #  device_index         = 0
+  #}
 
 }
 
