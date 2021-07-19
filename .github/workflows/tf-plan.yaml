@@ -39,7 +39,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} # if you have/need it
         aws-region: ${{ env.AWS_REGION }}
-
+        role-to-assume: 'OleaDeveloper'
 
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
@@ -50,15 +50,15 @@ jobs:
       
     - name: Terraform init
       run: |
-          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" init \
-            -backend=true \
-            -backend-config="dynamodb_table=tf-remote-state-lock" \
-            -backend-config="bucket=tc-remotestate-${TFSTATE_ID}"
-
-          #uses: actions/checkout@v2
+          cd "${GITHUB_WORKSPACE}/templates"
+          /usr/bin/terraform init 
+            #-backend=true \
+            #-backend-config="dynamodb_table=tf-remote-state-lock" \
+            #-backend-config="bucket=tc-remotestate-${TFSTATE_ID}"
 
     - name: Terraform plan
       run: |
-          /usr/bin/terraform -chdir="${GITHUB_WORKSPACE}/templates" \
+          cd "${GITHUB_WORKSPACE}/templates"
+          /usr/bin/terraform \
             plan -var-file="../${AWSENV}/terraform.tfvars"
       
