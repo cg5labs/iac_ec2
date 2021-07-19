@@ -39,7 +39,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }} # if you have/need it
         aws-region: ${{ env.AWS_REGION }}
-        role-to-assume: 'OleaDeveloper'
+        #role-to-assume: 'OleaDeveloper'
 
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
